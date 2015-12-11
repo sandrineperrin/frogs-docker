@@ -1,0 +1,16 @@
+## Application
+Software: affiliations_stat.py (version: 1.1.0)
+Command: /usr/local/bin/affiliations_stat.py --input-biom ./04-affiliation.biom --output-file ./06-affiliationsStat.html --log-file ./06-affiliationsStat.log --tax-consensus-tag blast_taxonomy --identity-tag perc_identity --coverage-tag perc_query_coverage --multiple-tag blast_affiliations --rarefaction-ranks Family Genus Species
+
+# Writes by sample the rarefaction data for rank(s) 4, 5, 6. (biomTools.py version : 0.7.2)
+Command:
+	biomTools.py rarefaction --input-file ./04-affiliation.biom --output-file-pattern ./1449742077.43_1_rarefaction_rank_##RANK##.tsv --taxonomy-key "blast_taxonomy" --step-size 793 --ranks 4 5 6
+Execution:
+	start: 10 Dec 2015 10:07:57
+	end:   10 Dec 2015 10:08:09
+# Produces a taxonomy tree with counts by sample. (biomTools.py version : 0.7.2)
+Command:
+	biomTools.py treeCount --input-file ./04-affiliation.biom --taxonomy-key "blast_taxonomy" --output-enewick ./1449742077.43_1_taxCount.enewick --output-samples ./1449742077.43_1_taxCount_ids.tsv
+Execution:
+	start: 10 Dec 2015 10:08:09
+	end:   10 Dec 2015 10:08:09

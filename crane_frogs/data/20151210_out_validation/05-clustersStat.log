@@ -1,0 +1,16 @@
+## Application
+Software :/usr/local/bin/clusters_stat.py (version : 1.1.0)
+Command : /usr/local/bin/clusters_stat.py --input-biom ./04-affiliation.biom --output-file ./05-clustersStat.html --log-file ./05-clustersStat.log
+
+# Hierarchical classification on observation proportions. (biomTools.py version : 0.7.2)
+Command:
+	biomTools.py hclassification --distance-method braycurtis --linkage-method average --input-file ./04-affiliation.biom --output-file ./1449742075.96_1_HClassif.newick
+Execution:
+	start: 10 Dec 2015 10:07:55
+	end:   10 Dec 2015 10:07:56
+# Writes by abundance the number of clusters. (biomTools.py version : 0.7.2)
+Command:
+	biomTools.py obsdepth --input-file ./04-affiliation.biom --output-file ./1449742075.96_1_depths.tsv
+Execution:
+	start: 10 Dec 2015 10:07:56
+	end:   10 Dec 2015 10:07:56

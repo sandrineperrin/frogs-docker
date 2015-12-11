@@ -1,0 +1,40 @@
+## Application
+Software :/root/clustering_dep/clustering.py (version : 1.2.0)
+Command : /root/clustering_dep/clustering.py --distance 3 --denoising --input-fasta ./01-prepro.fasta --input-count ./01-prepro.tsv --output-biom ./02-clustering.biom --output-fasta ./02-clustering.fasta --output-compo ./02-clustering_compo.tsv --log-file ./02-clustering.log --nb-cpus 1
+
+# Sort pre-clusters by abundancies. (sortAbundancies.py version : 1.4.0)
+Command:
+	sortAbundancies.py --size-separator ';size=' --input-file ./01-prepro.fasta --output-file ./1449587621.65_1_01-prepro_sorted.fasta
+Execution:
+	start: 08 Dec 2015 15:13:41
+	end:   08 Dec 2015 15:13:42
+# Clustering sequences. (swarm version : 2.1.5)
+Command:
+	swarm --differences 1 --threads 1 --log ./1449587621.65_1_01-prepro_denoisingSwarmLog.txt --output-file ./1449587621.65_1_01-prepro_denoisingSwarmCompo.txt ./1449587621.65_1_01-prepro_sorted.fasta
+Execution:
+	start: 08 Dec 2015 15:13:42
+	end:   08 Dec 2015 15:13:57
+# Extracts seeds sequences to produce the seeds fasta. (extractSwarmsFasta.py version : 1.2.0)
+Command:
+	extractSwarmsFasta.py --input-fasta ./1449587621.65_1_01-prepro_sorted.fasta --input-swarms ./1449587621.65_1_01-prepro_denoisingSwarmCompo.txt --output-fasta ./1449587621.65_1_01-prepro_denoisingSwarmSeeds.fasta
+Execution:
+	start: 08 Dec 2015 15:13:57
+	end:   08 Dec 2015 15:13:57
+# Clustering sequences. (swarm version : 2.1.5)
+Command:
+	swarm --differences 3 --threads 1 --log ./1449587621.65_1_01-prepro_swarmLog.txt --output-file ./1449587621.65_1_01-prepro_swarmD3Compo.txt ./1449587621.65_1_01-prepro_denoisingSwarmResizedSeeds.fasta
+Execution:
+	start: 08 Dec 2015 15:14:12
+	end:   08 Dec 2015 15:14:41
+# Converts swarm output to abundance file (format BIOM). (swarm2biom.py version : 1.1.0)
+Command:
+	swarm2biom.py --clusters-file ./02-clustering_compo.tsv --count-file ./01-prepro.tsv --output-file ./02-clustering.biom
+Execution:
+	start: 08 Dec 2015 15:14:42
+	end:   08 Dec 2015 15:14:43
+# Extracts seeds sequences to produce the seeds fasta. (extractSwarmsFasta.py version : 1.2.0)
+Command:
+	extractSwarmsFasta.py --input-fasta ./1449587621.65_1_01-prepro_denoisingSwarmResizedSeeds.fasta --input-swarms ./1449587621.65_1_01-prepro_swarmD3Compo.txt --output-fasta ./02-clustering.fasta
+Execution:
+	start: 08 Dec 2015 15:14:43
+	end:   08 Dec 2015 15:14:44
