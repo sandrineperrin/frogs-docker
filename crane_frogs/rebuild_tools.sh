@@ -4,6 +4,7 @@
 # Script pour régénérer automatiquement tous les outils de FROGS à partir d'un dépôt github
 # par build des images.
 
+FROM_BIOSHADOCK=false
 PREFIX=frogs 
 BIOSHADOCK=docker-registry.genouest.org/frogs/
 CWD=`pwd`
@@ -63,7 +64,7 @@ do
 	
 	# echo "------- in directory : $d"
 	
-	if [ "$d" == "preprocess" -o "$d" == "remove_chimera" -o "$d" == "clustering" ]
+	if [ "$FROM_BIOSHADOCK" == "true" ]
 	then
 		#  Push from BioShadock
 		docker pull ${BIOSHADOCK}${d}:latest
