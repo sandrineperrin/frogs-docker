@@ -8,6 +8,7 @@ FROM_BIOSHADOCK=false
 PREFIX=frogs 
 BIOSHADOCK=docker-registry.genouest.org/frogs/
 CWD=`pwd`
+FAIL=fail
 
 # Check argument
 if [ "$#" -ne 1 ]; then echo MISSING path argument ; exit 1 ; fi
@@ -26,7 +27,9 @@ CRANE_DIR=$(dirname $CRANE)
 
 
 
-# Arrêter les processus docker en cours
+# Arrêter les containers docker en cours
+docker stop $(docker ps -q) 2> /dev/null
+
 # // sous-script de nettoyage
 docker rm $(docker ps -aq) 2> /dev/null
 
@@ -76,13 +79,16 @@ do
 	
 		# Find build directory
 		s=$(ls */Dockerfile | sort | tail -n 1)
+		if [ -z "$s" ]; then STATUS=$FAIL ; echo FAIL not found Dockerfile in directory $d; exit 1; fi
+		
 		builddir=$(dirname $s)
+		if [ ! -d $builddir ]; then STATUS=$FAIL ; echo FAIL directory does not exit $builddir ; exit 1; fi
 
 		# echo $builddir is current build directory
 
 		# se déplacer dans le dossier
 		cd $builddir
-	
+		echo Find 	
 		# récuperer le nom et la version de l'outil
 		name=${builddir:0:-6}
 		version=${builddir:$((${#builddir}-5))}
@@ -100,8 +106,9 @@ do
 	cd $init_dir 
 
 done
+
 ###### Lancement de crane.yml
-if [ "$STATUS" == $FAIL ]
+if [ "$STATUS" == "$FAIL" ]
 then 
 	echo =========== FAIL create docker images
 	cd $CWD
@@ -110,6 +117,6 @@ else
 	echo =========== SUCCES create docker images
 	echo --------    run crane
 	/root/run_crane.sh $DIR 
-
+	cd $CWD
 fi
 
