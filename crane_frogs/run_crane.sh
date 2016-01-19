@@ -53,16 +53,21 @@ cd $CRANE_DIR
 cp -p $CRANE $CRANE.tmp
 
 # Update data path in crane file
-sed -i "s#\(volume: \\[\).*\(:/tmp\)#\1$CRANE_DATA\2#" $CRANE
+sed -i "s#\(volume: \\[\).*\(:/tmp\)#\1 \"$CRANE_DATA\2#" ${CRANE}.tmp
+
 
 # Parse docker images output to find image name and version
-for images in $(docker images | grep frogs | awk '{ print $1":"$2 }')
+for images in $(docker images | grep frogs | awk '{ print $1":"$2 }' )
 do
-	l=$( echo $images | grep -o "/.*:")
-        name=${l:1:-1}
+
+	image=$( echo $images | grep -o "/.*:")
+        name=${image:1:-1}
+
+	echo DEBUG name $image $name
+	
 
 	# Update crane file with tool name and version
-	sed -i "s#\(image:\) .*${name}.*#\1 $images#" $CRANE.tmp
+	sed -i "s#\(image:\) .*${name}.*#\1 $images#" ${CRANE}.tmp
 	
 	if [ $? -ne 0 ]
 	then 
@@ -73,7 +78,7 @@ do
 done
 
 rm $CRANE
-mv $CRANE.tmp $CRANE
+mv ${CRANE}.tmp $CRANE
 
 # less $CRANE | grep image
 
