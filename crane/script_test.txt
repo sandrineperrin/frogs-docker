@@ -1,0 +1,27 @@
+Procédure pour tester la construction des images docker à partir d'un dépôt de dockerfile et la lancement d'un pipeline de vérification.
+
+
+Pre-réquis:
+- docker
+- crane : (https://github.com/michaelsauter/crane)
+$ bash -c "`curl -sL https://raw.githubusercontent.com/michaelsauter/crane/v2.5.1/download.sh`" && sudo mv crane /usr/local/bin/crane
+
+
+Les scripts actuelles se basent sur un dépôt github de dockerfile, avec la structure suivante pour chaque outil :
+- <tool_name>/<tool_name>_<tool_version> : ces informations sont utilisées pour nommer et tagger l'image docker.
+- inclus un dossier crane
+
+script rebuild_tools.sh <path_directory>
+	* suppression de toutes les images préfixées avec frogs
+	* parcours l'arborescence et construit une image Docker par outil, pour la dernière version ajoutée;
+	* mise à jour du fichier crane.yml en fonction des images créées;
+	* lancement du pipeline de test avec le script run_crane.sh;
+
+script run_crane.sh <path_directory>
+	* à partir du fichier de configuration crane.xml qui définit comment lancer chaque image et comment lancer le workflow (ordre d'exécution des différents containers);
+	* crée un dossier de résultats du pipeline exécuté.
+
+
+
+
+
