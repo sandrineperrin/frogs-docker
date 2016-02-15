@@ -1,8 +1,0 @@
-## Application
-Software: normalisation.py (version: 0.6.0)
-Command: /usr/local/bin/normalisation.py --input-biom ./02-clustering.biom --input-fasta ./02-clustering.fasta --output-biom ./10-norma.biom --output-fasta ./10-norma.fasta --summary-file ./10-norma.html --log-file ./10-norm.log
-
-Application start: 09 Dec 2015 10:54:10
-
-#Normalisation calculation
-	start: 09 Dec 2015 10:54:10
