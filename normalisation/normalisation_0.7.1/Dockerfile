@@ -28,7 +28,7 @@ RUN apt-get install --yes $PACKAGES
 COPY bin/* /usr/local/bin/
 
 # Install tool
-COPY normalisation.py /usr/local/bin/
+COPY normalisation* /usr/local/bin/
 RUN chmod +x /usr/local/bin/*
 
 # Cleanup
