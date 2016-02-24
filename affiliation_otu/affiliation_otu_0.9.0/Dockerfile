@@ -29,10 +29,9 @@ ENV PACKAGES \
 ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
 # Update the repository sources list
-RUN apt-get update
-
-# Install dependency
-RUN apt-get install --yes $PACKAGES
+RUN apt-get update && \
+    apt-get install --yes $PACKAGES && \
+    apt-get clean
 
 # Download internal dependencies
 WORKDIR /tmp
@@ -41,7 +40,8 @@ RUN git clone https://github.com/rdpstaff/RDPTools.git && \
     git checkout $TOOL_VERSION && \
     git submodule update --init && \
     make  && \
-    cp *.jar /usr/local/bin/
+    cp *.jar /usr/local/bin/ && \
+    rm -r ${TOOL_NAME}*
 
 
 # Copy dependencies for RDPTools
@@ -54,9 +54,6 @@ COPY affiliation_* /usr/local/bin/
 # Make script executable
 RUN chmod +x /usr/local/bin/*
 
-# Cleanup
-RUN apt-get clean
-RUN rm -r ${TOOL_NAME}*
 WORKDIR /
 
 # Set entrypoint
