@@ -16,7 +16,9 @@ ENV TOOL_NAME tsv_to_biom
 ENV TOOL_VERSION 1.1.0
 ENV TOOL_PKG ${TOOL_ID}_v${TOOL_VERSION}.zip
 
-ENV PACKAGES python=2.7.3-4+deb7u1 perl=5.14.2-21+deb7u2 wget
+ENV PACKAGES \
+	python \
+	perl 
 
 # Update the repository sources list
 RUN apt-get update

@@ -17,7 +17,15 @@ ENV TOOL_NAME demultiplex
 ENV TOOL_VERSION 1.2.0
 ENV TOOL_PKG ${TOOL_ID}_v${TOOL_VERSION}.zip
 
-ENV PACKAGES python=2.7.3-4+deb7u1 perl=5.14.2-21+deb7u2 cpanminus=1.5015-1 make build-essential gcc-multilib apt-utils zlib1g-dev
+ENV PACKAGES \
+	apt-utils \
+	build-essential \
+	cpanminus \
+	gcc-multilib \
+	make \
+	perl \
+	python \
+	zlib1g-dev
 
 # Update the repository sources list
 RUN apt-get update
