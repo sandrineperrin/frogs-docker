@@ -1,87 +1,87 @@
 containers:
   init:
-    image: biom_to_tsv:2.1.0
+    image: docker-registry.genouest.org/frogs_1.3/biom_to_tsv:1.3.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["ls", "-l"]
   
   a-prep:
-    image: docker-registry.genouest.org/frogs/preprocess:latest
+    image: docker-registry.genouest.org/frogs_1.3/preprocess:1.6.1
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["preprocess.py","illumina","--min-amplicon-size","380","--max-amplicon-size","460","--five-prim-primer","GGCGVACGGGTGAGTAA","--three-prim-primer","GTGCCAGCNGCNGCGG","--R1-size","250","--R2-size","250","--expected-amplicon-size","420","--input-archive","../test_dataset.tar.gz","--output-dereplicated","./01-prepro.fasta","--output-count","./01-prepro.tsv","--summary","./01-prepro.html","--log-file","./01-prepro.log"]
 
   b-clust:
-    image: docker-registry.genouest.org/frogs/clustering:latest
+    image: docker-registry.genouest.org/frogs_1.3/clustering:1.3.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["clustering.py","--distance","3","--denoising","--input-fasta","./01-prepro.fasta","--input-count","./01-prepro.tsv","--output-biom","./02-clustering.biom","--output-fasta","./02-clustering.fasta","--output-compo","./02-clustering_compo.tsv","--log-file","./02-clustering.log","--nb-cpus","$nb_cpu"]
 
   c-remov:
-    image: docker-registry.genouest.org/frogs/remove_chimera:latest
+    image: docker-registry.genouest.org/frogs_1.3/remove_chimera:0.6.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["remove_chimera.py","--input-fasta","./02-clustering.fasta","--input-biom","./02-clustering.biom","--non-chimera","./03-chimera.fasta","--out-abundance","./03-chimera.biom","--summary","./03-chimera.html","--log-file","./03-chimera.log","--nb-cpus","$nb_cpu"]
     
   d-filter:
-    image: filters:1.2.0
+    image: docker-registry.genouest.org/frogs_1.3/filters:1.3.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["filters.py","--min-abundance","0.00005","--input-biom","./03-chimera.biom","--input-fasta","./03-chimera.fasta","--output-fasta","./04-filters.fasta","--output-biom","./04-filters.biom","--excluded","./04-filters.excluded","--summary","./04-filters.html","--log-file","./04-filters.log"]
 
   
   e-affotu:
-    image: affiliation_otu:0.9.0
+    image: docker-registry.genouest.org/frogs_1.3/affiliation_otu:0.10.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["affiliation_OTU.py","--reference","../db.fasta","--input-fasta","./04-filters.fasta","--input-biom","./04-filters.biom","--output-biom","./04-affiliation.biom","--summary","./04-affiliation.html","--log-file","./04-affiliation.log","--nb-cpus","$nb_cpu","--java-mem","$java_mem"]
  
   f-cluster:
-    image: clusters_stat:1.1.0
+    image: docker-registry.genouest.org/frogs_1.3/clusters_stat:1.2.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["clusters_stat.py","--input-biom","./04-affiliation.biom","--output-file","./05-clustersStat.html","--log-file","./05-clustersStat.log"]
   
   g-affstat:
-    image: affiliations_stat:1.1.0
+    image: docker-registry.genouest.org/frogs_1.3/affiliations_stat:1.2.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["affiliations_stat.py","--input-biom","./04-affiliation.biom","--output-file","./06-affiliationsStat.html","--log-file","./06-affiliationsStat.log","--tax-consensus-tag","blast_taxonomy","--identity-tag","perc_identity","--coverage-tag","perc_query_coverage","--multiple-tag","blast_affiliations","--rarefaction-ranks","Family","Genus","Species"]
 
   h-biomtsv: 
-   image: biom_to_tsv:2.1.0
+   image: docker-registry.genouest.org/frogs_1.3/biom_to_tsv:1.3.0
    run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["biom_to_tsv.py","--input-biom","./04-affiliation.biom","--input-fasta","./04-filters.fasta","--output-tsv","./07-biom2tsv.tsv","--output-multi-affi","./07-biom2tsv.multi","--log-file","./07-biom2tsv.log"]
 
   abiomstd:
-    image: biom_to_stdbiom:1.1.1 
+    image:  docker-registry.genouest.org/frogs_1.3/biom_to_stdbiom:1.2.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["biom_to_stdBiom.py", "-b", "../example.biom"]
 
 
   bdemux: 
-    image: demultiplex:1.1.0
+    image:  docker-registry.genouest.org/frogs_1.3/demultiplex:1.2.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["demultiplex.py", "--input-R1","../test.fastq","--input-barcode","../index.tsv"]
 
   norm:
-    image: normalisation:0.6.0
+    image: docker-registry.genouest.org/frogs_1.3/normalisation:0.8.0
     run:
-      volume: ["/Users/sandrineperrin/workspace/frogs-docker/crane_frogs/data:/tmp"]
+      volume: [ "/root/frogs-docker/crane/data:/tmp"]
       workdir: "/tmp/out"
       cmd: ["normalisation.py","--input-biom", "./02-clustering.biom", "--input-fasta", "./02-clustering.fasta","--num-reads","1","--output-biom","./10-norma.biom", "--output-fasta","./10-norma.fasta","--summary-file","./10-norma.html","--log-file","./10-norm.log"]  
       # cmd: ["normalisation.py","-h"]

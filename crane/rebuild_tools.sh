@@ -4,9 +4,9 @@
 # Script pour régénérer automatiquement tous les outils de FROGS à partir d'un dépôt github
 # par build des images.
 
-FROM_BIOSHADOCK=false
+FROM_BIOSHADOCK=true
 PREFIX=frogs 
-BIOSHADOCK=docker-registry.genouest.org/frogs/
+BIOSHADOCK=docker-registry.genouest.org/frogs_1.3/
 CWD=`pwd`
 FAIL=fail
 
@@ -69,29 +69,52 @@ do
 	
 	if [ "$FROM_BIOSHADOCK" == "true" ]
 	then
+
+		# Extract version 
+		link=$(readlink -f ./${d}/latest)
+		version=$(echo $link | rev | sed 's/_/:/' | rev | cut -d ':' -f2)
+
 		#  Push from BioShadock
-		docker pull ${BIOSHADOCK}${d}:latest
+		echo "docker pull ${BIOSHADOCK}${d}:${version}"
 		
 		if [ $? -ne 0 ]; then STATUS=$FAIL ; echo FAIL push docker $d; exit 1; fi	
+		
+		# Update crane file with tool name and version
+		imagename=${BIOSHADOCK}${d}:${version}
+		
+		for nb in $(grep -n "image:" $CRANE | grep $d | cut -d ":" -f1)
+		do
+			echo "change for $d found $nb"
+
+			if [ "X$nb" == "X" ]; then  continue ; fi
+
+			echo "sed -i "${nb}s,\(image: \).*$ ,\1 ${imagename}," $CRANE	"
+			sed -i "${nb}s,\(image: \).*$,\1 ${imagename}," $CRANE	
+		
+			if [ $? -ne 0 ]; then STATUS=$FAIL ; echo FAIL update crane file ; exit 1; fi	
+		done
 	else
 		# Build docker image
 		cd $d
 	
 		# Find build directory
-		s=$(ls */Dockerfile | sort | tail -n 1)
+		l=$(ls latest/Dockerfile | sort | tail -n 1)
+		s=$(readlink -f $l)
+
 		if [ -z "$s" ]; then STATUS=$FAIL ; echo FAIL not found Dockerfile in directory $d; exit 1; fi
 		
 		builddir=$(dirname $s)
 		if [ ! -d $builddir ]; then STATUS=$FAIL ; echo FAIL directory does not exit $builddir ; exit 1; fi
 
-		# echo $builddir is current build directory
+		echo $builddir is current build directory
 
 		# se déplacer dans le dossier
 		cd $builddir
 		echo Find 	
-		# récuperer le nom et la version de l'outil
-		name=${builddir:0:-6}
-		version=${builddir:$((${#builddir}-5))}
+		# récuperer le nom et la version de outil
+		n=$(echo $builddir | awk -F "/" '{ print $NF}' | rev | sed 's/_/:/' | rev)
+		name=$(echo $n | cut -d ':' -f1)
+		version=$(echo $n | cut -d ':' -f2)
 
 		# lancer le build
 		docker build -t ${PREFIX}/${name}:${version} .
